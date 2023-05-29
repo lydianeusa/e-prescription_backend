@@ -1,17 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const patientController = require('../controllers/patientController')
+const patientController = require('../controllers/patientController');
+const authController = require('../controllers/authController');
 
 router
     .route('/')
     .get(patientController.findAllPatients)
-    .post(patientController.createPatient)
+    .post(authController.protect, patientController.createPatient)
 
 router
     .route('/:id')
     .get(patientController.findPatientByPk)
-    .put(patientController.updatePatient)
-    .delete(patientController.deletePatient)
+    .put(authController.protect, patientController.updatePatient)
+    .delete(authController.protect, patientController.deletePatient)
     
     
 module.exports = router; 

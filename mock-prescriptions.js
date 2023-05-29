@@ -1,4 +1,5 @@
 const prescriptions = [
+
     {
         medicine_name: "Smecta",
         dosage: "200 mg",
@@ -23,7 +24,7 @@ const prescriptions = [
         frequency: "un fois par jour, le matin",
         duration: "6 mois",
         PatientId: 2,
-        PhysicianId: 2,
+        PhysicianId: 1,
         PharmacyId: 2
     },
     {

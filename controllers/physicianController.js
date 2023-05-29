@@ -2,9 +2,17 @@ const { Op, UniqueConstraintError, ValidationError, QueryTypes } = require('sequ
 const { PhysicianModel, sequelize } = require('../db/sequelize')
 
 exports.findAllPhysicians = (req, res) => {
+    console.log(req.query)
   if(req.query.search){
-      // notre recherche avec paramètres
-      PhysicianModel.findAll({ where: { last_name: {[Op.like] : `%${req.query.search}%`} } })
+      PhysicianModel.findAll({ where: { 
+        [Op.or]: [
+            { last_name: { [Op.like]: `%${req.query.search}%` } },
+            { first_name: { [Op.like]: `%${req.query.search}%` } },
+            { specialty: { [Op.like]: `%${req.query.search}%` } },
+            { city: { [Op.like]: `%${req.query.search}%` } },
+            { zipcode: { [Op.like]: `%${req.query.search}%` } },
+            ], 
+        } })
       .then((elements)=>{
           if(!elements.length){
               return res.json({message: "Aucune médecin ne correspond à votre recherche"})    
@@ -13,6 +21,7 @@ exports.findAllPhysicians = (req, res) => {
           res.json({message: msg, data: elements})
       })
       .catch((error) => {
+            console.log(error);
           const msg = 'Une erreur est survenue.'
           res.status(500).json({message: msg})
       })
@@ -30,17 +39,16 @@ exports.findAllPhysicians = (req, res) => {
 }
 
 exports.createPhysician = (req, res) => {
-  let newPhysician = req.body;
 
   PhysicianModel.create({
-      first_name: newPhysician.first_name,
-      last_name: newPhysician.last_name,
-      specialty: newPhysician.specialty,
-      address: newPhysician.address,
-      zipcode: newPhysician.zipcode,
-      city: newPhysician.city,
-      phone_number: newPhysician.phone_number,
-      email: newPhysician.email
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      specialty: req.body.specialty,
+      address: req.body.address,
+      zipcode: req.body.zipcode,
+      city: req.body.city,
+      phone_number: req.body.phone_number,
+      email: req.body.email
   }).then((el) => {
       const msg = 'Un médecin a bien été ajouté.'
       res.json({ message: msg, data: el })

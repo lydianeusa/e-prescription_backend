@@ -11,7 +11,8 @@ exports.findAllPharmacies = (req, res) => {
         { name: { [Op.like]: `%${searchQuery}%` } },
         { city: { [Op.like]: `%${searchQuery}%` } },
         { zipcode: { [Op.like]: `%${searchQuery}%` } },
-    ], } })
+        ], 
+        } })
       .then((elements)=>{
           if(!elements.length){
               return res.json({message: "Aucune paharmacie ne correspond à votre recherche"})    
