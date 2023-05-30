@@ -26,27 +26,27 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
   
-        PatientId:{
-          type: DataTypes.INTEGER,
-            // model: 'patients', // <<< Note, its table's name, not object name
-            // key: 'id', // <<< Note, its a column name
+      //   PatientId:{
+      //     type: DataTypes.INTEGER,
+      //       // model: 'patients', // <<< Note, its table's name, not object name
+      //       // key: 'id', // <<< Note, its a column name
       
-          allowNull: false
-       },
+      //     allowNull: false
+      //  },
   
-       PhysicianId:{
-              type: DataTypes.INTEGER,
-            //   model: 'physicians', // <<< Note, its table's name, not object name
-            //   key: 'id', // <<< Note, its a column name
-              allowNull: false
-       },
+      //  PhysicianId:{
+      //         type: DataTypes.INTEGER,
+      //       //   model: 'physicians', // <<< Note, its table's name, not object name
+      //       //   key: 'id', // <<< Note, its a column name
+      //         allowNull: false
+      //  },
   
-       PharmacyId:{
-              type: DataTypes.INTEGER,
-            //   model: 'pharmacies', // <<< Note, its table's name, not object name
-            //   key: 'id', // <<< Note, its a column name
-              allowNull: false
-       }
+      //  PharmacyId:{
+      //         type: DataTypes.INTEGER,
+      //       //   model: 'pharmacies', // <<< Note, its table's name, not object name
+      //       //   key: 'id', // <<< Note, its a column name
+      //         allowNull: false
+      //  }
       }
       )
   }

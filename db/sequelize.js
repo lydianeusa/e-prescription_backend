@@ -48,41 +48,68 @@ PrescriptionModel.belongsTo(PharmacyModel);
 
 
 const initDb = () => {
-    return sequelize.sync({force: true}) 
+    return sequelize.sync({force: true})
     .then(() => {
-            patients.forEach((element) => {
-                PatientModel.create({
-                    first_name: element.first_name,
-                    last_name: element.last_name,
-                    birth_date: element.birth_date,
-                    email: element.email,
-                })
-            });
-            pharmacies.forEach((element) => {
-                PharmacyModel.create({
-                    name: element.name,
-                    address: element.address,
-                    zipcode: element.zipcode,
-                    city: element.city,
-                    phone_number: element.phone_number,
-                    email: element.email,
-                })
-            });
-            physicians.forEach((element) => {
-                PhysicianModel.create({
-                  first_name: element.first_name,
-                    last_name: element.last_name,
-                    specialty: element.specialty,
-                    address: element.address,
-                    zipcode: element.zipcode,
-                    city: element.city,
-                    phone_number: element.phone_number,
-                    email: element.email,
-                })
-            });
+        bcrypt.hash('mdp', 10)
+        .then((hash) => {
+            UserModel.create({
+                username: 'lydiane',
+                password: hash,
+                roles: ['user']
+            })
+        })
+        .catch(err => console.log(err))
+    })
+    .then(() => {    
+        physicians.forEach((element) => {
+            PhysicianModel.create({
+                id: element.id,
+                first_name: element.first_name,
+                last_name: element.last_name,
+                specialty: element.specialty,
+                address: element.address,
+                zipcode: element.zipcode,
+                city: element.city,
+                phone_number: element.phone_number,
+                email: element.email,
+            })
+        });
+    })
+    .then(() => {
+        pharmacies.forEach((element) => {
+            PharmacyModel.create({
+                id: element.id,
+                name: element.name,
+                address: element.address,
+                zipcode: element.zipcode,
+                city: element.city,
+                phone_number: element.phone_number,
+                email: element.email,
+            })
+        });
+    })
+    .then(() => {
+        patients.forEach((element) => {
+            PatientModel.create({
+                id: element.id,
+                first_name: element.first_name,
+                last_name: element.last_name,
+                birth_date: element.birth_date,
+                email: element.email,
+            })
+        });
+        PatientModel.create({
+            id: 4,
+            first_name: "Stéphane",
+            last_name: "Durand",
+            birth_date: "2000-05-05",
+            email: "stephane@gmail.com",
+        })
+        .then(() => {
             prescriptions.forEach((element) => {
                 PrescriptionModel.create({
-                  medicine_name: element.medicine_name,
+                    id: element.id,
+                    medicine_name: element.medicine_name,
                     dosage: element.dosage,
                     duration: element.duration,
                     frequency: element.frequency,
@@ -91,16 +118,10 @@ const initDb = () => {
                     PatientId: element.PatientId
                 })
             });
-            bcrypt.hash('mdp', 10)
-            .then((hash) => {
-                UserModel.create({
-                    username: 'lydiane',
-                    password: hash,
-                    roles: ['user']
-                })
-            })
-            .catch(err => console.log(err))
         })
+
+
+    })
     .catch(error => console.log(error))
 }
 

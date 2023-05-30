@@ -1,5 +1,6 @@
 const physicians = [
     {
+        id: 1,
         first_name: "Viriginie",
         last_name: "Lengline",
         specialty: "Dermatologue",
@@ -10,6 +11,7 @@ const physicians = [
         email: "virginie.lengline@gmail.com"
     },
     {
+        id: 2,
         first_name: "Bertrand",
         last_name: "Michotte",
         specialty: "Généraliste",
@@ -20,6 +22,7 @@ const physicians = [
         email: "bertrand.michotte@gmail.com"
     },
     {
+        id: 3,
         first_name: "Caroline",
         last_name: "Dupond",
         specialty: "Généraliste",
