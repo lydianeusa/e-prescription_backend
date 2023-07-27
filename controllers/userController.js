@@ -3,7 +3,11 @@ const { UserModel } = require('../db/sequelize')
 
 
 exports.findAllUsers = (req, res) => {
-    UserModel.scope('withoutPassword').findAll()
+    UserModel.scope('withoutPassword').findAll({
+        where:{
+            roles:req.params.roles
+        }
+    })
         .then((elements)=>{
             const msg = 'La liste des utilisateurs a bien été récupérée en base de données.'
             res.json({message: msg, data: elements})

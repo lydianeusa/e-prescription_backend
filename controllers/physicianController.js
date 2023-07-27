@@ -1,5 +1,5 @@
 const { Op, UniqueConstraintError, ValidationError, QueryTypes } = require('sequelize');
-const { PhysicianModel, sequelize } = require('../db/sequelize')
+const { PhysicianModel, UserModel } = require('../db/sequelize')
 
 exports.findAllPhysicians = (req, res) => {
     console.log(req.query)
@@ -26,7 +26,7 @@ exports.findAllPhysicians = (req, res) => {
           res.status(500).json({message: msg})
       })
   } else {
-      PhysicianModel.findAll()
+      PhysicianModel.findAll({include: UserModel})
       .then((elements)=>{
           const msg = 'La liste des médecins a été récupérée en base de données.'
           res.json({message: msg, data: elements})
@@ -39,25 +39,35 @@ exports.findAllPhysicians = (req, res) => {
 }
 
 exports.createPhysician = (req, res) => {
-
-  PhysicianModel.create({
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      specialty: req.body.specialty,
-      address: req.body.address,
-      zipcode: req.body.zipcode,
-      city: req.body.city,
-      phone_number: req.body.phone_number,
-      email: req.body.email
-  }).then((el) => {
-      const msg = 'Un médecin a bien été ajouté.'
-      res.json({ message: msg, data: el })
-  }).catch(error => {
-      if(error instanceof UniqueConstraintError || error instanceof ValidationError){
-          return res.status(400).json({message: error.message, data: error})
-      } 
-      res.status(500).json(error)
-  })
+    UserModel.create({
+        email: req.body.email,
+        username: req.body.username,
+        password: req.body.password,
+        roles: req.body.roles,
+    })
+    .then((user)=>{
+        PhysicianModel.create({
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            specialty: req.body.specialty,
+            address: req.body.address,
+            zipcode: req.body.zipcode,
+            city: req.body.city,
+            phone_number: req.body.phone_number,
+            verification_number: req.body.verification_number,
+            UserId: user.id
+        })
+        .then((el) => {
+            const msg = 'Un médecin a bien été ajouté.'
+            res.json({ message: msg, data: el })
+        })
+        .catch(error => {
+            if(error instanceof UniqueConstraintError || error instanceof ValidationError){
+                return res.status(400).json({message: error.message, data: error})
+            } 
+            res.status(500).json(error)
+        })
+    })
 }
 
 exports.findPhysicianByPk = (req, res) => {

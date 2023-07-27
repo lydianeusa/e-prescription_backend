@@ -1,7 +1,7 @@
 
 
 const { Op, UniqueConstraintError, ValidationError, QueryTypes } = require('sequelize');
-const { PharmacyModel, sequelize } = require('../db/sequelize')
+const { PharmacyModel, UserModel} = require('../db/sequelize')
 
 exports.findAllPharmacies = (req, res) => {
   if(req.query.search){
@@ -22,40 +22,46 @@ exports.findAllPharmacies = (req, res) => {
       })
       .catch((error) => {
           const msg = 'Une erreur est survenue.'
-          res.status(500).json({message: msg})
+          res.status(500).json({message: msg, error})
       })
   } else {
-      PharmacyModel.findAll()
+      PharmacyModel.findAll({include: UserModel})
       .then((elements)=>{
           const msg = 'La liste des pharmacies a été récupérée en base de données.'
           res.json({message: msg, data: elements})
       })
       .catch((error) => {
           const msg = 'Une erreur est survenue pour la liste des pharmacies.'
-          res.status(500).json({message: msg})
+          res.status(500).json({message: msg, error})
       })
   }
 }
 
 exports.createPharmacy = (req, res) => {
-  let newPharmacy = req.body;
-
+    UserModel.create({
+        email: req.body.email,
+        username: req.body.username,
+        password: req.body.password,
+        roles: req.body.roles,
+      }).then((user)=>{
   PharmacyModel.create({
-      name: newPharmacy.name,
-      address: newPharmacy.address,
-      zipcode: newPharmacy.zipcode,
-      city: newPharmacy.city,
-      phone_number: newPharmacy.phone_number,
-      email: newPharmacy.email
-  }).then((el) => {
+      name: req.body.name,
+      address: req.body.address,
+      zipcode: req.body.zipcode,
+      city: req.body.city,
+      phone_number: req.body.phone_number,
+      verification_number: req.body.verification_number,
+      UserId: user.id,
+  }).then((element) => {
       const msg = 'Une pharmacie a bien été ajoutée.'
-      res.json({ message: msg, data: el })
+      res.json({ message: msg, data: element })
   }).catch(error => {
       if(error instanceof UniqueConstraintError || error instanceof ValidationError){
           return res.status(400).json({message: error.message, data: error})
       } 
       res.status(500).json(error)
   })
+    })
 }
 
 exports.findPharmacyByPk = (req, res) => {

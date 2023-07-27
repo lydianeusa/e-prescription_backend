@@ -8,7 +8,7 @@ const { PrescriptionModel, PharmacyModel, PatientModel, PhysicianModel, sequeliz
 exports.findAllPrescriptions = (req, res) => {
   if(req.query.search){
       PrescriptionModel.findAll
-      ({ where: { medecine_name: {[Op.like] : `%${req.query.search}%`} } })
+      ({ where: { medicine_name: {[Op.like] : `%${req.query.search}%`} } })
       .then((elements)=>{
           if(!elements.length){
               return res.json({message: "Aucune ordonnance ne correspond à votre recherche"})    

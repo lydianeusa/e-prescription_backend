@@ -1,6 +1,6 @@
 
 const { Op, UniqueConstraintError, ValidationError, QueryTypes } = require('sequelize');
-const { PatientModel, sequelize, PrescriptionModel } = require('../db/sequelize')
+const { PatientModel, UserModel, PrescriptionModel } = require('../db/sequelize')
 
 exports.findAllPatients = (req, res) => {
     console.log(req.query)
@@ -25,39 +25,49 @@ exports.findAllPatients = (req, res) => {
       })
       .catch((error) => {
           const msg = 'Une erreur est survenue.'
-          res.status(500).json({message: msg})
+          res.status(500).json({message: msg, error})
       })
   } else {
-      PatientModel.findAll({include: [PrescriptionModel]})
+      PatientModel.findAll({include: [UserModel, PrescriptionModel]})
       .then((elements)=>{
           const msg = 'La liste des patients a été récupérée en base de données.'
           res.json({message: msg, data: elements})
       })
       .catch((error) => {
           const msg = 'Une erreur est survenue pour la liste des patients.'
-          res.status(500).json({message: msg})
+          res.status(500).json({message: msg, error})
       })
   }
 }
 
-exports.createPatient = (req, res) => {
-  let newPatient = req.body;
 
+
+exports.createPatient = (req, res) => {
+    UserModel.create({
+        email: req.body.email,
+        username: req.body.username,
+        password: req.body.password,
+        roles: req.body.roles,
+      }).then((user)=>{
   PatientModel.create({
-      first_name: newPatient.first_name,
-      last_name: newPatient.last_name,
-      birth_date: newPatient.birth_date,
-      phone_number: newPatient.phone_number,
-      email: newPatient.email
-  }).then((el) => {
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      address: req.body.address,
+      zipcode: req.body.zipcode,
+      city: req.body.city,
+      phone_number: req.body.phone_number,
+      birth_date: req.body.birth_date,
+      UserId: user.id
+  }).then((element) => {
       const msg = 'Un patient a bien été ajouté.'
-      res.json({ message: msg, data: el })
+      res.json({ message: msg, data: element })
   }).catch(error => {
       if(error instanceof UniqueConstraintError || error instanceof ValidationError){
           return res.status(400).json({message: error.message, data: error})
       } 
       res.status(500).json(error)
   })
+    });
 }
 
 exports.findPatientByPk = (req, res) => {
@@ -77,6 +87,7 @@ exports.findPatientByPk = (req, res) => {
             res.status(500).json({ message, data: error })
         })
 }
+  
 
 exports.updatePatient = (req, res) => {
     PatientModel.update(req.body, {

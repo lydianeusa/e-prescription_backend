@@ -1,38 +1,26 @@
 const physicians = [
     {
-        id: 1,
-        first_name: "Viriginie",
-        last_name: "Lengline",
-        specialty: "Dermatologue",
-        address: "2, rue Beaudésert",
-        zipcode: "33700",
-        city: "Mérignac",
-        phone_number: "05 56 43 21 23",
-        email: "virginie.lengline@gmail.com"
-    },
-    {
-        id: 2,
+        last_name: "Durand",
         first_name: "Bertrand",
-        last_name: "Michotte",
-        specialty: "Généraliste",
-        address: "3, rue McCarthy",
-        zipcode: "33700",
-        city: "Mérignac",
-        phone_number: "05 56 43 21 23",
-        email: "bertrand.michotte@gmail.com"
+        specialty: "Dermatologue",
+        address: "5 avenue Les Eyquems",
+        zipcode: "33000",
+        city: "Bordeaux",
+        phone_number: "0552364198",
+        verification_number: 1123254478,
+        UserId: 3,
     },
     {
-        id: 3,
-        first_name: "Caroline",
-        last_name: "Dupond",
-        specialty: "Généraliste",
-        address: "3, rue Dufour",
-        zipcode: "33700",
-        city: "Mérignac",
-        phone_number: "05 56 43 21 23",
-        email: "caroline.dufour@gmail.com"
-    }
-
+        last_name: "Legrand",
+        first_name: "Lola",
+        specialty: "Ophtalmologue",
+        address: "5 avenue Les Eyquems",
+        zipcode: "33000",
+        city: "Bordeaux",
+        phone_number: "0552364498",
+        verification_number: 1123554475,
+        UserId: 5,
+    },
 ];
 
-module.exports = physicians
+module.exports = physicians;

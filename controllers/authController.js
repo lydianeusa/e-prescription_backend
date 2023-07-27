@@ -1,5 +1,5 @@
 const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { UserModel } = require('../db/sequelize')
+const { UserModel, PhysicianModel, PatientModel, PharmacyModel } = require('../db/sequelize')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
@@ -20,7 +20,7 @@ exports.login = (req, res) => {
             bcrypt.compare(req.body.password, user.password)
                 .then(isValid => {
                     if(!isValid){
-                        const msg = "Le mot de passe est incorrect."
+                        const msg = "Information incorrecte."
                         return res.status(404).json({message: msg})
                     }
 
@@ -41,26 +41,68 @@ exports.login = (req, res) => {
 }
 
 exports.signup = (req, res) => {
-    // 1. on récupère le password dans le body et on le hash .then()
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             return UserModel.create({
+                email: req.body.email,
                 username: req.body.username,
-                password: hash
-            }).then((userCreated) => {
+                password: hash,
+                roles: req.body.roles,    
+            })
+            .then((user)=> {
+                if (req.body.roles.includes("physician")) {
+                    return PhysicianModel.create({
+                        first_name: req.body.first_name,
+                        last_name: req.body.last_name,
+                        specialty: req.body.specialty,
+                        address: req.body.address,
+                        zipcode: req.body.zipcode,
+                        city: req.body.city,
+                        phone_number: req.body.phone_number,
+                        verification_number: req.body.verification_number,
+                        UserId: user.id
+                    });
+                } else if (req.body.roles.includes("patient")) {
+                    return PatientModel.create({
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
+                    address: req.body.address,
+                    zipcode: req.body.zipcode,
+                    city: req.body.city,
+                    phone_number: req.body.phone_number,
+                    birth_date: req.body.birth_date,
+                    UserId: user.id
+                    })
+                } else if (req.body.roles.includes("pharmacist")) {
+                    return PharmacyModel.create({
+                        name: req.body.name,
+                        address: req.body.address,
+                        zipcode: req.body.zipcode,
+                        city: req.body.city,
+                        phone_number: req.body.phone_number,
+                        verification_number: req.body.verification_number,
+                        UserId: user.id, 
+                    });
+                }
+            })
+            .then((userCreated) => {
                 const message = `L'utilisateur ${userCreated.username} a bien été créé` 
                 userCreated.password = 'hidden';
                 return res.json({message, data: userCreated})
-            })
+            })            
+            .catch(error => {
+                if(error instanceof UniqueConstraintError || error instanceof ValidationError){
+                    return res.status(400).json({message: error.message, data: error})
+                } 
+                const message = "Un problème est survenu lors de la création du profil"
+                return res.status(500).json({message, data:error})
+            });
         })
         .catch(error => {
-            if(error instanceof UniqueConstraintError || error instanceof ValidationError){
-                return res.status(400).json({message: error.message, data: error})
-            } 
-            const message = "Un problème est survenu lors de la création du profil"
-            return res.status(500).json({message, data:error})
-        })
-}
+            const message = "Un problème est survenu lors de la création du profil";
+            return res.status(500).json({ message, data: error });
+    });
+};
 
 exports.protect = (req, res, next) => {
     const authorizationHeader = req.headers.authorization
@@ -69,36 +111,34 @@ exports.protect = (req, res, next) => {
         const message = "Un jeton est nécessaire pour accéder à la ressource"
         return res.status(401).json({message})
     }
-
     try {
         const token = authorizationHeader.split(' ')[1];
         const decoded = jwt.verify(token, privateKey)
-        req.userId = decoded.data
+        req.userId = decoded.data;
+        console.log(req.userId)
     } catch (err) {
         const message = "Jeton invalide"
         return res.status(403).json({message, data: err})
     }
-    
     return next();
 }
 
-// exports.restrictTo = (...roles) => {
-//     return (req, res, next) => {
-//         UserModel.findByPk(req.userId)
-//             .then(user => { 
-//                 console.log(user.username, user.id, roles) 
-//                 if(!user || !roles.every(role => user.roles.includes(role))){
-//                     const message = "Droits insuffisants";
-//                     return res.status(403).json({message}) 
-//                 }
-//                 return next();
-//             })
-//             .catch(err => {
-//                 const message = "Erreur lors de l'autorisation"
-//                 res.status(500).json({message, data: err})
-//             })    
-//     }
-// }
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        UserModel.findByPk(req.userId)
+            .then(user => {
+                if(!user || !roles.every(role => user.roles.includes(role))){
+                    const message = "Droits insuffisants";
+                    return res.status(403).json({message}) 
+                }
+                return next();
+            })
+            .catch(err => {
+                const message = "Erreur lors de l'autorisation"
+                res.status(500).json({message, data: err})
+            })    
+    }
+}
 
 // exports.restrictToOwnUser = (req, res, next) => {
 //     ReviewModel.findByPk(req.params.id)

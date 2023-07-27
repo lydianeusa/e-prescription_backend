@@ -1,4 +1,4 @@
-const userRoles = ['user', 'admin', 'superadmin']
+const UserRoles = ['patient', 'physician', 'pharmacist', 'admin'];
 
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('User', {
@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
       username: {
         type: DataTypes.STRING,
@@ -20,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       roles: {
         type: DataTypes.STRING,
-        defaultValue: 'user',
+        defaultValue: 'patient',
         set(roles) {
           this.setDataValue('roles', roles.join());
         },
@@ -33,8 +37,8 @@ module.exports = (sequelize, DataTypes) => {
               throw new Error('Un utilisateur doit avoir au moins un rôle')
             }
             roles.split(',').forEach(role => {
-              if(!userRoles.includes(role)){
-                throw new Error(`Les rôles d'un utilisateur doivent appartenir à la liste suivante : ${userRoles}`)
+              if(!UserRoles.includes(role)){
+                throw new Error(`Les rôles d'un utilisateur doivent appartenir à la liste suivante : ${UserRoles}`)
               }
             })
           }
