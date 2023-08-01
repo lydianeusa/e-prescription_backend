@@ -7,10 +7,6 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true
       },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: true
-      },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -27,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 'patient',
         set(roles) {
           this.setDataValue('roles', roles.join());
+
         },
         get() {
           return this.getDataValue('roles').split(',');

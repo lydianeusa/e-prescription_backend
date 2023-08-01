@@ -39,13 +39,13 @@ exports.findAllPharmacies = (req, res) => {
 
 exports.createPharmacy = (req, res) => {
     UserModel.create({
-        email: req.body.email,
         username: req.body.username,
         password: req.body.password,
         roles: req.body.roles,
       }).then((user)=>{
   PharmacyModel.create({
       name: req.body.name,
+      email: req.body.email,
       address: req.body.address,
       zipcode: req.body.zipcode,
       city: req.body.city,

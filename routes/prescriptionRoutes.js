@@ -6,19 +6,27 @@ const authController = require('../controllers/authController');
 
 router
     .route('/')
-    .get(prescriptionController.findAllPrescriptions)
+    .get(
+        authController.protect, 
+        prescriptionController.findAllPrescriptions)
     .post(
-        // authController.protect, 
+        authController.protect,
+        // authController.restrictTo ('admin', 'physician',), 
         prescriptionController.createPrescription)
 
     router
     .route('/:id')
-    .get(prescriptionController.findPrescriptionByPk)
+    .get(
+        authController.protect, 
+        // authController.restrictTo ('admin', 'physician', 'pharmacist', 'patient'),
+        prescriptionController.findPrescriptionByPk)
     .put(
-        // authController.protect, 
+        authController.protect, 
+        // authController.restrictTo ('admin', 'physician',),
         prescriptionController.updatePrescription)
     .delete(
-        // authController.protect, 
+        authController.protect, 
+        // authController.restrictTo ('admin', 'physician',),
         prescriptionController.deletePrescription)
     
 module.exports = router; 

@@ -7,21 +7,25 @@ router
     .route('/')
     .get(
         authController.protect, 
-        authController.restrictTo ('admin', 'physician', 'pharmacist'), 
         patientController.findAllPatients)
     .post(
-        // authController.protect, 
-        // authController.restrictTo ('admin', 'physician'), 
+        authController.protect, 
+        // authController.restrictTo ('admin'), 
         patientController.createPatient)
 
 router
     .route('/:id')
-    .get(patientController.findPatientByPk)
+    .get(
+        authController.protect, 
+        authController.restrictTo ('admin', 'physician', 'pharmacist'), 
+        patientController.findPatientByPk)
     .put(
-        // authController.protect, 
+        authController.protect,
+        // authController.restrictTo ('admin'), 
         patientController.updatePatient)
     .delete(
-        // authController.protect, 
+        authController.protect,
+        // authController.restrictTo ('admin'),
         patientController.deletePatient)
     
     

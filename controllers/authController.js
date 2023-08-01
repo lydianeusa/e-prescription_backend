@@ -47,7 +47,8 @@ exports.signup = (req, res) => {
                 email: req.body.email,
                 username: req.body.username,
                 password: hash,
-                roles: req.body.roles,    
+                roles: [req.body.roles],
+                // roles: req.body.roles,      
             })
             .then((user)=> {
                 if (req.body.roles.includes("physician")) {
@@ -123,22 +124,50 @@ exports.protect = (req, res, next) => {
     return next();
 }
 
+// exports.restrictTo = (...roles) => {
+//     return (req, res, next) => {
+//         UserModel.findByPk(req.userId)
+//             .then(user => {
+//                 if(!user || !roles.every(role => user.roles.includes(role))){
+//                     const message = "Droits insuffisants";
+//                     return res.status(403).json({message}) 
+//                 }
+//                 return next();
+//             })
+//             .catch(err => {
+//                 const message = "Erreur lors de l'autorisation"
+//                 res.status(500).json({message, data: err})
+//             })    
+//     }
+// }
+
+// chatgpt
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
         UserModel.findByPk(req.userId)
             .then(user => {
-                if(!user || !roles.every(role => user.roles.includes(role))){
+                if (!user || typeof user.roles !== 'string') {
+                    const message = "Invalid user or roles data type";
+                    return res.status(403).json({ message });
+                }
+                // Now you can safely check if roles are included
+                if (!roles.every(role => user.roles.includes(role))) {
                     const message = "Droits insuffisants";
-                    return res.status(403).json({message}) 
+                    return res.status(403).json({ message });
                 }
                 return next();
             })
             .catch(err => {
-                const message = "Erreur lors de l'autorisation"
-                res.status(500).json({message, data: err})
-            })    
-    }
-}
+                console.error("Error in restrictTo middleware:", err);
+                const message = "Erreur lors de l'autorisation";
+                res.status(500).json({ message, data: err });
+            });
+    };
+};
+
+
+
+
 
 // exports.restrictToOwnUser = (req, res, next) => {
 //     ReviewModel.findByPk(req.params.id)

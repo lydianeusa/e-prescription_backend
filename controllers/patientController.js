@@ -44,7 +44,6 @@ exports.findAllPatients = (req, res) => {
 
 exports.createPatient = (req, res) => {
     UserModel.create({
-        email: req.body.email,
         username: req.body.username,
         password: req.body.password,
         roles: req.body.roles,
@@ -52,6 +51,7 @@ exports.createPatient = (req, res) => {
   PatientModel.create({
       first_name: req.body.first_name,
       last_name: req.body.last_name,
+      email: req.body.email,
       address: req.body.address,
       zipcode: req.body.zipcode,
       city: req.body.city,
