@@ -10,23 +10,24 @@ router
         patientController.findAllPatients)
     .post(
         authController.protect, 
-        // authController.restrictTo ('admin'), 
+        authController.restrictTo ('admin'), 
         patientController.createPatient)
 
 router
     .route('/:id')
     .get(
-        authController.protect, 
+        authController.protect,    
         authController.restrictTo ('admin', 'physician', 'pharmacist'), 
         patientController.findPatientByPk)
     .put(
         authController.protect,
-        // authController.restrictTo ('admin'), 
+        authController.restrictTo ('admin'), 
         patientController.updatePatient)
     .delete(
         authController.protect,
-        // authController.restrictTo ('admin'),
+        authController.restrictTo ('admin'),
         patientController.deletePatient)
-    
+
+        
     
 module.exports = router; 

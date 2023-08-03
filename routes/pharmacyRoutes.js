@@ -8,7 +8,7 @@ router
     .get(pharmacyController.findAllPharmacies)
     .post(
         authController.protect, 
-        // authController.restrictTo ('admin'),
+        authController.restrictTo ('admin'),
         pharmacyController.createPharmacy)
 
     router

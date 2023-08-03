@@ -258,27 +258,27 @@ const initDb = async () => {
 
     for (const userData of users) {
       const user = await UserModel.create(userData);
-      console.log('User created:', user);
+      // console.log('User created:', user);
     }
 
     for (const element of pharmacies) {
       const createdPharmacy = await PharmacyModel.create(element);
-      console.log('Pharmacy created:', createdPharmacy);
+      // console.log('Pharmacy created:', createdPharmacy);
     }
   
       for (const element of physicians) {
         const createdPhysician = await PhysicianModel.create(element);
-        console.log('Physician created:', createdPhysician);
+        // console.log('Physician created:', createdPhysician);
       }
   
       for (const element of patients) {
         const createdPatient = await PatientModel.create(element);
-        console.log('Patient created:', createdPatient);
+        // console.log('Patient created:', createdPatient);
       }
   
       for (const element of prescriptions) {
         const createdPrescription = await PrescriptionModel.create(element);
-        console.log('Prescription created:', createdPrescription);
+        // console.log('Prescription created:', createdPrescription);
       }
 
     console.log('Data initialization completed.');

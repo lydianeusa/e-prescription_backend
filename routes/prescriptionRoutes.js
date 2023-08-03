@@ -10,23 +10,23 @@ router
         authController.protect, 
         prescriptionController.findAllPrescriptions)
     .post(
-        authController.protect,
-        // authController.restrictTo ('admin', 'physician',), 
+        // authController.protect,
+        // authController.restrictTo ('admin', 'physician'), 
         prescriptionController.createPrescription)
 
     router
     .route('/:id')
     .get(
         authController.protect, 
-        // authController.restrictTo ('admin', 'physician', 'pharmacist', 'patient'),
+        authController.restrictTo ('admin', 'physician', 'pharmacist', 'patient'),
         prescriptionController.findPrescriptionByPk)
     .put(
         authController.protect, 
-        // authController.restrictTo ('admin', 'physician',),
+        authController.restrictTo ('admin', 'physician'),
         prescriptionController.updatePrescription)
     .delete(
         authController.protect, 
-        // authController.restrictTo ('admin', 'physician',),
+        authController.restrictTo ('admin', 'physician',),
         prescriptionController.deletePrescription)
     
 module.exports = router; 
