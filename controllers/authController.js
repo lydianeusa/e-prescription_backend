@@ -4,44 +4,15 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
 
-// exports.login = (req, res) => {
-//     if(!req.body.username || !req.body.password){
-//         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
-//         return res.status(400).json({message: msg})
-//     }  
-//     UserModel.findOne({ where : {username: req.body.username}})
-//         .then(user => {
-//             if(!user){
-//                 const msg = "L'utilisateur demandé n'existe pas."
-//                 return res.status(404).json({message: msg})
-//             }
-//             bcrypt.compare(req.body.password, user.password)
-//                 .then(isValid => {
-//                     if(!isValid){
-//                         const msg = "Information incorrecte."
-//                         return res.status(404).json({message: msg})
-//                     }
-//                     // json web token
-//                     const token = jwt.sign({
-//                         data: user.id
-//                       }, privateKey, { expiresIn: '24h' });
-//                     const msg = "L'utilisateur a été connecté avec succès."
-//                     user.password = "hidden"
-//                     return res.json({message: msg, user, token})
-//                 })
-//         })
-//         .catch(error => {
-//             const msg = "L'utilisateur n'a pas pu se connecter."
-//             return res.status(500).json({message: msg, error})
-//         })
-// }
 
+// chatgpt version
 exports.login = (req, res) => {
     if(!req.body.username || !req.body.password){
         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
         return res.status(400).json({message: msg})
     }  
-    UserModel.findOne({ where : {username: req.body.username}})
+    UserModel.findOne({ where : {username: req.body.username},
+        include: PatientModel })
         .then(user => {
             if(!user){
                 const msg = "L'utilisateur demandé n'existe pas."
@@ -69,6 +40,10 @@ exports.login = (req, res) => {
                       privateKey, { expiresIn: '24h' });
                     const msg = "L'utilisateur a été connecté avec succès."
                     user.password = "hidden"
+                    let patientId = null;
+                    if (user.roles.includes("patient")) {
+                        patientId = user.Patient ? user.Patient.id : null;
+                    }
                     return res.json({message: msg, user, token})
                 })
         })
@@ -77,6 +52,48 @@ exports.login = (req, res) => {
             return res.status(500).json({message: msg, error})
         })
 }
+
+// exports.login = (req, res) => {
+//     if(!req.body.username || !req.body.password){
+//         const msg = "Veuillez fournir un nom d'utilisateur et un mot de passe."
+//         return res.status(400).json({message: msg})
+//     }  
+//     UserModel.findOne({ where : {username: req.body.username}})
+//         .then(user => {
+//             if(!user){
+//                 const msg = "L'utilisateur demandé n'existe pas."
+//                 return res.status(404).json({message: msg})
+//             }
+//             if (!user.roles || user.roles.length === 0) {
+//                 const msg = "User role not found.";
+//                 return res.status(404).json({ message: msg });
+//             }
+//             bcrypt.compare(req.body.password, user.password)
+//                 .then(isValid => {
+//                     if(!isValid){
+//                         const msg = "Information incorrecte."
+//                         return res.status(404).json({message: msg})
+//                     }
+//                     // json web token
+//                     const token = jwt.sign(
+//                         {
+//                             data: {
+//                                 id: user.id,
+//                                 username: user.username,
+//                             },
+//                             role: user.roles[0],
+//                         }, 
+//                       privateKey, { expiresIn: '24h' });
+//                     const msg = "L'utilisateur a été connecté avec succès."
+//                     user.password = "hidden"
+//                     return res.json({message: msg, user, token})
+//                 })
+//         })
+//         .catch(error => {
+//             const msg = "L'utilisateur n'a pas pu se connecter."
+//             return res.status(500).json({message: msg, error})
+//         })
+// }
 
 exports.signup = (req, res) => {
     bcrypt.hash(req.body.password, 10)
@@ -142,26 +159,6 @@ exports.signup = (req, res) => {
     });
 };
 
-// exports.protect = (req, res, next) => {
-//     const authorizationHeader = req.headers.authorization
-
-//     if(!authorizationHeader){
-//         const message = "Un jeton est nécessaire pour accéder à la ressource"
-//         return res.status(401).json({message})
-//     }
-//     try {
-//         const token = authorizationHeader.split(' ')[1];
-//         const decoded = jwt.verify(token, privateKey)
-//         req.userId = decoded.data;
-//         console.log(req.userId)
-//     } catch (err) {
-//         const message = "Jeton invalide"
-//         return res.status(403).json({message, data: err})
-//     }
-//     return next();
-// }
-
-// authController.js
 exports.protect = (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
@@ -195,6 +192,44 @@ exports.restrictTo = (...roles) => {
   };
   
 
+// exports.restrictToOwnPatient = (req, res, next) => {
+//     PatientModel.findByPk(req.params.id)
+//         .then(patient => { 
+//             if(!patient){
+//                 const message = `L'ordonnance n°${req.params.id} n'existe pas`
+//                 return res.status(404).json({message})
+//             }
+//             if(patient.UserId !== req.user.data.id){
+//                 const message = "Tu n'es pas le créateur de cette ressource";
+//                 return res.status(403).json({message}) 
+//             }
+//             return next();
+//         })
+//         .catch(err => {
+//             const message = "Erreur lors de l'autorisation"
+//             res.status(500).json({message, data: err})
+//         })    
+// }
+
+// exports.protect = (req, res, next) => {
+//     const authorizationHeader = req.headers.authorization
+
+//     if(!authorizationHeader){
+//         const message = "Un jeton est nécessaire pour accéder à la ressource"
+//         return res.status(401).json({message})
+//     }
+//     try {
+//         const token = authorizationHeader.split(' ')[1];
+//         const decoded = jwt.verify(token, privateKey)
+//         req.userId = decoded.data;
+//         console.log(req.userId)
+//     } catch (err) {
+//         const message = "Jeton invalide"
+//         return res.status(403).json({message, data: err})
+//     }
+//     return next();
+// }
+
 // exports.restrictTo = (...roles) => {
 //     return (req, res, next) => {
 //         UserModel.findByPk(req.userId)
@@ -211,24 +246,4 @@ exports.restrictTo = (...roles) => {
 //                 res.status(500).json({message, data: err})
 //             })    
 //     }
-// }
-
-
-// exports.restrictToOwnUser = (req, res, next) => {
-//     ReviewModel.findByPk(req.params.id)
-//         .then(review => { 
-//             if(!review){
-//                 const message = `Le commentaire n°${req.params.id} n'existe pas`
-//                 return res.status(404).json({message})
-//             }
-//             if(review.UserId != req.userId){
-//                 const message = "Tu n'es pas le créateur de cette ressource";
-//                 return res.status(403).json({message}) 
-//             }
-//             return next();
-//         })
-//         .catch(err => {
-//             const message = "Erreur lors de l'autorisation"
-//             res.status(500).json({message, data: err})
-//         })    
 // }

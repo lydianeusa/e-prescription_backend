@@ -10,8 +10,8 @@ router
         authController.protect, 
         prescriptionController.findAllPrescriptions)
     .post(
-        // authController.protect,
-        // authController.restrictTo ('admin', 'physician'), 
+        authController.protect,
+        authController.restrictTo ('admin', 'physician'), 
         prescriptionController.createPrescription)
 
     router

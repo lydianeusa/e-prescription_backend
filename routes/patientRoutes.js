@@ -17,7 +17,7 @@ router
     .route('/:id')
     .get(
         authController.protect,    
-        authController.restrictTo ('admin', 'physician', 'pharmacist'), 
+        authController.restrictTo ('admin', 'physician', 'pharmacist', 'patient'), 
         patientController.findPatientByPk)
     .put(
         authController.protect,

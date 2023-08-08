@@ -5,33 +5,35 @@ const { PrescriptionModel, PharmacyModel, PatientModel, PhysicianModel, sequeliz
 
 
 
-exports.findAllPrescriptions = (req, res) => {
-  if(req.query.search){
-      PrescriptionModel.findAll
-      ({ where: { medicine_name: {[Op.like] : `%${req.query.search}%`} } })
-      .then((elements)=>{
-          if(!elements.length){
-              return res.json({message: "Aucune ordonnance ne correspond à votre recherche"})    
-          }
-          const msg = 'La liste des ordonnances a bien été récupérée en base de données.'
-          res.json({message: msg, data: elements})
-      })
-      .catch((error) => {
-          const msg = 'Une erreur est survenue.'
-          res.status(500).json({message: msg})
-      })
-  } else {
-      PrescriptionModel.findAll({include:[PatientModel, PhysicianModel, PharmacyModel]})
-      .then((elements)=>{
-          const msg = 'La liste des ordonnances a été récupérée en base de données.'
-          res.json({message: msg, data: elements})
-      })
-      .catch((error) => {
-          const msg = 'Une erreur est survenue pour la liste des ordonnances.'
-          res.status(500).json({message: msg})
-      })
-  }
-}
+  exports.findAllPrescriptions = (req, res) => {
+    if (req.query.search) {
+        PrescriptionModel.findAll({
+            where: { medicine_name: { [Op.like]: `%${req.query.search}%` } },
+            include: [PatientModel, PhysicianModel, PharmacyModel]
+        })
+            .then((elements) => {
+                if (!elements.length) {
+                    return res.json({ message: "Aucune ordonnance ne correspond à votre recherche" });
+                }
+                const msg = 'La liste des ordonnances a bien été récupérée en base de données.';
+                res.json({ message: msg, data: elements });
+            })
+            .catch((error) => {
+                const msg = 'Une erreur est survenue.';
+                res.status(500).json({ message: msg });
+            });
+    } else {
+        PrescriptionModel.findAll({ include: [PatientModel, PhysicianModel, PharmacyModel] })
+            .then((elements) => {
+                const msg = 'La liste des ordonnances a été récupérée en base de données.';
+                res.json({ message: msg, data: elements });
+            })
+            .catch((error) => {
+                const msg = 'Une erreur est survenue pour la liste des ordonnances.';
+                res.status(500).json({ message: msg });
+            });
+    }
+};
 
 exports.createPrescription = (req, res) => {
     PrescriptionModel.create({
@@ -114,3 +116,31 @@ exports.deletePrescription = (req, res) => {
             res.status(500).json({ message, data: error })
         })
 }
+
+// exports.findAllPrescriptions = (req, res) => {
+//     if(req.query.search){
+//         PrescriptionModel.findAll
+//         ({ where: { medicine_name: {[Op.like] : `%${req.query.search}%`} } })
+//         .then((elements)=>{
+//             if(!elements.length){
+//                 return res.json({message: "Aucune ordonnance ne correspond à votre recherche"})    
+//             }
+//             const msg = 'La liste des ordonnances a bien été récupérée en base de données.'
+//             res.json({message: msg, data: elements})
+//         })
+//         .catch((error) => {
+//             const msg = 'Une erreur est survenue.'
+//             res.status(500).json({message: msg})
+//         })
+//     } else {
+//         PrescriptionModel.findAll({include:[PatientModel, PhysicianModel, PharmacyModel]})
+//         .then((elements)=>{
+//             const msg = 'La liste des ordonnances a été récupérée en base de données.'
+//             res.json({message: msg, data: elements})
+//         })
+//         .catch((error) => {
+//             const msg = 'Une erreur est survenue pour la liste des ordonnances.'
+//             res.status(500).json({message: msg})
+//         })
+//     }
+//   }  

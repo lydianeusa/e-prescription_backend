@@ -39,13 +39,16 @@ exports.findAllPhysicians = (req, res) => {
 }
 
 exports.createPhysician = (req, res) => {
-    UserModel.create({
+    bcrypt.hash(req.body.password, 10)
+    .then(hash => {
+        return UserModel.create({
         username: req.body.username,
         password: req.body.password,
         roles: req.body.roles,
+        })
     })
     .then((user)=>{
-        PhysicianModel.create({
+        return PhysicianModel.create({
             first_name: req.body.first_name,
             last_name: req.body.last_name,
             email: req.body.email,
@@ -57,6 +60,7 @@ exports.createPhysician = (req, res) => {
             verification_number: req.body.verification_number,
             UserId: user.id
         })
+    })
         .then((el) => {
             const msg = 'Un médecin a bien été ajouté.'
             res.json({ message: msg, data: el })
@@ -67,7 +71,6 @@ exports.createPhysician = (req, res) => {
             } 
             res.status(500).json(error)
         })
-    })
 }
 
 exports.findPhysicianByPk = (req, res) => {

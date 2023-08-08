@@ -38,21 +38,27 @@ exports.findAllPharmacies = (req, res) => {
 }
 
 exports.createPharmacy = (req, res) => {
-    UserModel.create({
+    bcrypt.hash(req.body.password, 10)
+    .then(hash => {
+        return UserModel.create({
         username: req.body.username,
-        password: req.body.password,
+        password: hash,
         roles: req.body.roles,
-      }).then((user)=>{
-  PharmacyModel.create({
-      name: req.body.name,
-      email: req.body.email,
-      address: req.body.address,
-      zipcode: req.body.zipcode,
-      city: req.body.city,
-      phone_number: req.body.phone_number,
-      verification_number: req.body.verification_number,
-      UserId: user.id,
-  }).then((element) => {
+      })
+    })
+    .then((user)=>{
+        return PharmacyModel.create({
+        name: req.body.name,
+        email: req.body.email,
+        address: req.body.address,
+        zipcode: req.body.zipcode,
+        city: req.body.city,
+        phone_number: req.body.phone_number,
+        verification_number: req.body.verification_number,
+        UserId: user.id,
+        })
+    })
+  .then((element) => {
       const msg = 'Une pharmacie a bien été ajoutée.'
       res.json({ message: msg, data: element })
   }).catch(error => {
@@ -61,7 +67,6 @@ exports.createPharmacy = (req, res) => {
       } 
       res.status(500).json(error)
   })
-    })
 }
 
 exports.findPharmacyByPk = (req, res) => {
